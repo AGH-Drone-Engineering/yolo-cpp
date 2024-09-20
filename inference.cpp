@@ -1,5 +1,6 @@
 #include "inference.h"
 
+#include <iostream>
 #include <random>
 
 Inference::Inference(std::string onnxModelPath, cv::Size modelInputShape, std::vector<std::string> classes)
