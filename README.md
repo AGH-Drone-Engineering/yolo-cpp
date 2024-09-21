@@ -13,6 +13,7 @@ yolo export model=yolov8n.pt format=onnx simplify=True
 ```bash
 sudo cp libyolocpp.so /usr/lib
 sudo cp yolocpp.hpp /usr/include
+sudo ldconfig
 ```
 
 ### Use
@@ -22,15 +23,13 @@ sudo cp yolocpp.hpp /usr/include
 
 int main() {
     YOLOCPP inf("yolov8n.onnx", 640, 640, {"classes", "..."});
+    // see main.cpp for more details
 }
 ```
 
-### Build example
-
 ```bash
-meson setup builddir
-ninja -C builddir main
-./builddir/main
+g++ main.cpp $(pkg-config --cflags --libs opencv4) -lyolocpp -o main
+./main
 ```
 
 ## Build library (optional)
