@@ -1,4 +1,4 @@
-#include "yolocpp.h"
+#include "yolocpp.hpp"
 
 #include <iostream>
 

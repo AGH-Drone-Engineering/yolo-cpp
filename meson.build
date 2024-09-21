@@ -1,5 +1,7 @@
-project('yolo-cpp', 'cpp')
+project('yolo-cpp', 'cpp', default_options : ['cpp_std=c++17'])
 
 opencv_dep = dependency('opencv4')
 
-executable('main', 'main.cpp', 'inference.cpp', dependencies : opencv_dep)
+yolocpp_lib = shared_library('yolocpp', 'yolocpp.cpp', dependencies : opencv_dep)
+
+executable('main', 'main.cpp', dependencies : opencv_dep, link_with : yolocpp_lib)
