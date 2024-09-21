@@ -25,6 +25,14 @@ int main() {
 }
 ```
 
+### Build example
+
+```bash
+meson setup builddir
+ninja -C builddir main
+./builddir/main
+```
+
 ## Build library (optional)
 
 ### Build static OpenCV
