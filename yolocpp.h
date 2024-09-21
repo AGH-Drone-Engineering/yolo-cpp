@@ -5,8 +5,6 @@
 #include <string>
 #include <memory>
 
-#include <opencv2/core.hpp>
-
 class YOLOCPP
 {
 public:
@@ -15,15 +13,14 @@ public:
         int class_id;
         std::string class_name;
         float confidence;
-        cv::Scalar color;
-        cv::Rect box;
+        int x, y, w, h;
     };
 
-    YOLOCPP(std::string model_path, cv::Size input_shape, std::vector<std::string> classes);
+    YOLOCPP(std::string model_path, int width, int height, std::vector<std::string> classes);
 
     ~YOLOCPP();
 
-    std::vector<Detection> detect(const cv::Mat &input);
+    std::vector<Detection> detect(const uint8_t *img, int width, int height, int channels);
 
     float confidence_threshold = 0.25;
     float score_threshold = 0.45;

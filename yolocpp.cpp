@@ -1,7 +1,6 @@
 #include "yolocpp.h"
 
 #include <iostream>
-#include <random>
 
 #include <opencv2/opencv.hpp>
 
@@ -64,8 +63,8 @@ public:
         }
         float *data = (float *)outputs[0].data;
 
-        float x_factor = model_input.cols / _input_shape.width;
-        float y_factor = model_input.rows / _input_shape.height;
+        float x_factor = static_cast<float>(model_input.cols) / static_cast<float>(_input_shape.width);
+        float y_factor = static_cast<float>(model_input.rows) / static_cast<float>(_input_shape.height);
 
         std::vector<int> class_ids;
         std::vector<float> confidences;
@@ -151,16 +150,11 @@ public:
             Detection result;
             result.class_id = class_ids[idx];
             result.confidence = confidences[idx];
-
-            std::random_device rd;
-            std::mt19937 gen(rd());
-            std::uniform_int_distribution<int> dis(100, 255);
-            result.color = cv::Scalar(dis(gen),
-                                    dis(gen),
-                                    dis(gen));
-
-            result.className = _classes[result.class_id];
-            result.box = boxes[idx];
+            result.class_name = _classes[result.class_id];
+            result.x = boxes[idx].x;
+            result.y = boxes[idx].y;
+            result.w = boxes[idx].width;
+            result.h = boxes[idx].height;
 
             detections.push_back(result);
         }
@@ -176,14 +170,23 @@ private:
     cv::dnn::Net _net;
 };
 
-YOLOCPP::YOLOCPP(std::string model_path, cv::Size input_shape, std::vector<std::string> classes)
-    : _impl(std::make_unique<Impl>(std::move(model_path), std::move(input_shape), std::move(classes)))
+YOLOCPP::YOLOCPP(std::string model_path, int width, int height, std::vector<std::string> classes)
+    : _impl(std::make_unique<Impl>(std::move(model_path), cv::Size(width, height), std::move(classes)))
 {
 }
 
 YOLOCPP::~YOLOCPP() = default;
 
-std::vector<YOLOCPP::Detection> YOLOCPP::detect(const cv::Mat &input)
+std::vector<YOLOCPP::Detection> YOLOCPP::detect(const uint8_t *img, int width, int height, int channels)
 {
+    if (img == nullptr)
+    {
+        throw std::invalid_argument("Image is null");
+    }
+    if (channels != 3)
+    {
+        throw std::invalid_argument("Image must have 3 channels");
+    }
+    cv::Mat input(height, width, CV_8UC3, (void*)img);
     return _impl->detect(input, confidence_threshold, score_threshold, nms_threshold, letterbox);
 }
